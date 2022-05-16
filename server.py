@@ -20,4 +20,4 @@ osc = OSCThreadServer()  # See sources for all the arguments
 # You can also use an \*nix socket path here
 sock = osc.listen(address='0.0.0.0', port=8000, default=True)
 
-osc.bind(b'/check', callback)
+osc.bind(b'/check', getRenderStatus)
