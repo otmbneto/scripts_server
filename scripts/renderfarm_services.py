@@ -24,7 +24,12 @@ class Renderfarm:
 	def oc_login(self,site,login,password):
 
 		owncloud_client = owncloud.Client(site)
-		owncloud_client.login(login,password)
+		try:
+			owncloud_client.login(login,password)
+		except:
+			owncloud_client = owncloud.Client(site,verify_certs=False)
+			owncloud_client.login(login,password)
+
 		return owncloud_client
 
 
