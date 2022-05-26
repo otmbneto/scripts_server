@@ -2,6 +2,7 @@ import os
 from oscpy.server import OSCThreadServer
 import scripts.renderfarm_services as srs
 import time
+import json
 
 rf = None
 def getRenderStatus(args):
@@ -17,16 +18,30 @@ def getRenderStatus(args):
 
 def foo(args):
 
+	print "hello"
 	print(args)
 
 	return "output"
 
+def hello(args):
+
+	print "hello"
+	return ""
+
 def getRoutes():
 
+	script_path = os.path.abspath(os.path.dirname(__file__))
+	json_path = os.path.join(script_path,"functions.json").replace("\\","/")
+	if not os.path.exists(json_path):
+	    return {}
 
-	return
+	with open(json_path,"r") as json_file:    
+	    content = json_file.read()
 
-routes = {'!check':getRenderStatus,'!juntator':foo}
+	return json.loads(content)
+
+#routes = {"!check":"getRenderStatus","!juntator":"foo"}
+routes = getRoutes()
 
 def answer(args,port = None):
 
@@ -46,14 +61,11 @@ def messageReceived(*msg):
 	output = "ERRO:Comando desconhecido: {0}".format(msg[0])
 	f = getRoute(msg[0])
 	if f is not None:
-		output = f(msg[1:-3])
+		output = eval(f + "("+ str(msg[1:-3]) +")")
 
 	output = msg[-3] + output
 	answer([str(output),str(msg[-1])],port=int(msg[-2]))
 	return
-
-#messageReceived(b'/ju',b'MNM_EP105',b'Ola fulano!\n',str(3500).encode(),b'asdasdsadasf23123asd')
-
 
 osc = OSCThreadServer()  # See sources for all the arguments
 
